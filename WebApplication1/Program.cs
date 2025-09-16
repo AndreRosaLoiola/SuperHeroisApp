@@ -1,9 +1,13 @@
+using WebApplication1.IoC;
+using WebApplication1.Repositories;
+using WebApplication1.MockDeDados;
 using Microsoft.EntityFrameworkCore;
 using ViceriSeidorHero.Models;
 using WebApplication1.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Registrar dependÃªncias do projeto
+builder.Services.AddProjectDependencies();
 // Add services to the container.
 builder.Services.AddDbContext<ViceriSeidorHeroContext>(options =>
     options.UseInMemoryDatabase("HeroisDb"));
@@ -34,18 +38,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ViceriSeidorHeroContext>();
-    if (!context.Superpoderes.Any())
-    {
-        context.Superpoderes.AddRange(
-            new Superpoderes { Superpoder = "Voar", Descricao = "Capacidade de voar pelos céus." },
-            new Superpoderes { Superpoder = "Super Força", Descricao = "Força física sobre-humana." },
-            new Superpoderes { Superpoder = "Invisibilidade", Descricao = "Ficar invisível aos olhos humanos." }
-        );
-        context.SaveChanges();
-    }
+    MockDeDados.PopularBanco(context);
 }
 
 app.UseHttpsRedirection();
